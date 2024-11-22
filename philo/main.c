@@ -6,31 +6,11 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 13:58:06 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/22 17:31:11 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/22 18:26:58 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-
-typedef struct s_data
-{
-	int			number_of_philosophers;
-	int			time_to_die;
-	int			time_to_eat;
-	int			time_to_sleep;
-	int			number_of_times_each_philosopher_must_eat;
-	long long	time_start;
-} t_data;
-
-typedef struct s_philo
-{
-	int		id;
-	char 	*right_fork;
-	char 	*left_fork;
-	t_data 	*data;
-} t_philo;
-
-
 
 int	ft_atoi(const char *nptr)
 {
@@ -55,13 +35,6 @@ int	ft_atoi(const char *nptr)
 	return (num * mult);
 }
 
-long long get_time()
-{
-	struct timeval tv;
-	gettimeofday(&tv, NULL);
-	return (tv.tv_sec * 1000 + tv.tv_usec / 1000);
-}
-
 t_data parse_argv(int argc, char **argv)
 {
 	t_data	data;
@@ -78,37 +51,22 @@ t_data parse_argv(int argc, char **argv)
 	return (data);
 }
 
-long long get_timestamp(long long time_start)
+t_fork *init_forks(int number_of_forks)
 {
-	return (get_time() - time_start);
+	t_fork *forks = malloc(sizeof(t_fork) * number_of_forks);
+	if(!forks)
+		return (NULL);
+	int i = 0;
+	while(i < number_of_forks)
+	{
+		forks[i].status = 1;
+		pthread_mutex_init(&forks[i].mutex, NULL);
+		i++;
+	}
+	return (forks);
 }
 
-//0 = taken, 1 = free
-void take_fork()
-{
-
-}
-
- // eat > sleep > think > eat
-
-void *philo_think(void *void_data)
-{
-	t_philo philo = *(t_philo *)void_data;
-	printf("%05lld %d is thinking\n", get_timestamp(philo.data->time_start), philo.id);
-	return NULL;
-}
-
-void *philo_sleep(void *void_data)
-{
-	t_philo philo = *(t_philo *)void_data;
-	printf("%05lld %d is sleeping\n", get_timestamp(philo.data->time_start), philo.id);
-	usleep(philo.data->time_to_sleep * 1000);
-	philo_think(void_data);
-	return NULL;
-}
-
-
-t_philo *init_philosophers(t_data *data, char *forks)
+t_philo *init_philosophers(t_data *data, t_fork *forks)
 {
 	int i;
 	t_philo *philosophers;
@@ -143,10 +101,9 @@ int main(int argc, char **argv)
 
 	//setup
 	t_data data = parse_argv(argc, argv);
-	char *forks = malloc(sizeof(char) * data.number_of_philosophers);
+	t_fork *forks = init_forks(data.number_of_philosophers);
 	if(!forks)
 		return (1);
-	memset(forks, 1, data.number_of_philosophers);
 	t_philo *philosophers = init_philosophers(&data, forks);
 	if(!philosophers)
 	{
@@ -159,7 +116,7 @@ int main(int argc, char **argv)
 	int i = 0;
 	while(i < data.number_of_philosophers)
 	{
-		pthread_create(&philo_threads[i], NULL, philo_sleep, philosophers + i);
+		pthread_create(&philo_threads[i], NULL, philo_think, philosophers + i);
 		i++;
 	}
 	i = 0;

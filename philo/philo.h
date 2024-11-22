@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 13:58:19 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/22 13:59:38 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/22 17:43:55 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,39 @@
 # include <string.h>
 # include <sys/time.h>
 
+typedef struct s_data
+{
+	int			number_of_philosophers;
+	int			time_to_die;
+	int			time_to_eat;
+	int			time_to_sleep;
+	int			number_of_times_each_philosopher_must_eat;
+	long long	time_start;
+} t_data;
 
+typedef struct s_fork
+{
+	int				status;
+	pthread_mutex_t	mutex;
+} t_fork;
+
+typedef struct s_philo
+{
+	int		id;
+	t_fork 	*right_fork;
+	t_fork 	*left_fork;
+	t_data 	*data;
+} t_philo;
+
+//actions1.c
+void	*philo_take_left_fork(void *void_data);
+void	*philo_take_right_fork(void *void_data);
+void	*philo_eat(void *void_data);
+void	*philo_think(void *void_data);
+void	*philo_sleep(void *void_data);
+
+//time.c
+long long	get_time();
+long long	get_timestamp(long long time_start);
 
 #endif
