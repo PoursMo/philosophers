@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 13:58:06 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/22 18:26:58 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/22 18:40:02 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,6 +123,14 @@ int main(int argc, char **argv)
 	while(i < data.number_of_philosophers)
 	{
 		pthread_join(philo_threads[i], NULL);
+		i++;
+	}
+
+	//cleanup
+	i = 0;
+	while (i < data.number_of_philosophers)
+	{
+		pthread_mutex_destroy(&forks[i].mutex);
 		i++;
 	}
 	free(philo_threads);
