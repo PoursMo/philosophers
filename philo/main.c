@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 13:58:06 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/22 18:40:02 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/23 14:10:12 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,22 +51,21 @@ t_data parse_argv(int argc, char **argv)
 	return (data);
 }
 
-t_fork *init_forks(int number_of_forks)
+pthread_mutex_t *init_forks(int number_of_forks)
 {
-	t_fork *forks = malloc(sizeof(t_fork) * number_of_forks);
+	pthread_mutex_t *forks = malloc(sizeof(pthread_mutex_t) * number_of_forks);
 	if(!forks)
 		return (NULL);
 	int i = 0;
 	while(i < number_of_forks)
 	{
-		forks[i].status = 1;
-		pthread_mutex_init(&forks[i].mutex, NULL);
+		pthread_mutex_init(&forks[i], NULL);
 		i++;
 	}
 	return (forks);
 }
 
-t_philo *init_philosophers(t_data *data, t_fork *forks)
+t_philo *init_philosophers(t_data *data, pthread_mutex_t *forks)
 {
 	int i;
 	t_philo *philosophers;
@@ -86,6 +85,8 @@ t_philo *init_philosophers(t_data *data, t_fork *forks)
 		else
 			philosophers[i].right_fork = NULL;
 		philosophers[i].data = data;
+		philosophers[i].last_meal = data->time_start;
+		philosophers[i].eat_count = 0;
 		i++;
 	}
 	return (philosophers);
@@ -101,7 +102,7 @@ int main(int argc, char **argv)
 
 	//setup
 	t_data data = parse_argv(argc, argv);
-	t_fork *forks = init_forks(data.number_of_philosophers);
+	pthread_mutex_t *forks = init_forks(data.number_of_philosophers);
 	if(!forks)
 		return (1);
 	t_philo *philosophers = init_philosophers(&data, forks);
@@ -130,7 +131,7 @@ int main(int argc, char **argv)
 	i = 0;
 	while (i < data.number_of_philosophers)
 	{
-		pthread_mutex_destroy(&forks[i].mutex);
+		pthread_mutex_destroy(&forks[i]);
 		i++;
 	}
 	free(philo_threads);
