@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 13:58:19 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/23 14:04:59 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/24 13:31:39 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,22 +28,26 @@ typedef struct s_data
 	int			time_to_sleep;
 	int			number_of_times_each_philosopher_must_eat;
 	long long	time_start;
+	char		stop;
+	pthread_mutex_t stop_mutex;
 } t_data;
 
 typedef struct s_philo
 {
-	int		id;
-	pthread_mutex_t 	*right_fork;
-	pthread_mutex_t 	*left_fork;
-	t_data 	*data;
-	long long	last_meal;
-	int		eat_count;
+	int				id;
+	pthread_mutex_t *right_fork;
+	pthread_mutex_t *left_fork;
+	t_data 			*data;
+	long long		last_meal;
+	pthread_mutex_t	last_meal_mutex;
+	int				eat_count;
+	pthread_mutex_t eat_count_mutex;
 } t_philo;
 
 //actions1.c
-void	*philo_take_left_fork(void *void_data);
-void	*philo_take_right_fork(void *void_data);
-void	*philo_eat(void *void_data);
+void	philo_take_left_fork(void *void_data);
+void	philo_take_right_fork(void *void_data);
+void	philo_eat(void *void_data);
 void	*philo_think(void *void_data);
 void	*philo_sleep(void *void_data);
 
