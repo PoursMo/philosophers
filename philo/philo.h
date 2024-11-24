@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 13:58:19 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/24 13:31:39 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/24 15:38:44 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,11 +45,12 @@ typedef struct s_philo
 } t_philo;
 
 //actions1.c
-void	philo_take_left_fork(void *void_data);
-void	philo_take_right_fork(void *void_data);
-void	philo_eat(void *void_data);
+void	*philo_take_left_fork(void *void_data);
+void	*philo_take_right_fork(void *void_data);
+void	*philo_eat(void *void_data);
 void	*philo_think(void *void_data);
 void	*philo_sleep(void *void_data);
+void	*philo_loop(void *void_data);
 
 //time.c
 long long	get_time();

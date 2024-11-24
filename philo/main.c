@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 13:58:06 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/24 14:07:13 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/24 16:06:35 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,12 +107,12 @@ void *monitor(void *void_data)
 		while(i < philosophers[0].data->number_of_philosophers)
 		{
 			pthread_mutex_lock(&philosophers[i].last_meal_mutex);
-			if(get_time() - philosophers[i].last_meal > philosophers[i].data->time_to_die)
+			if(get_time() - philosophers[i].last_meal >= philosophers[i].data->time_to_die)
 			{
-				printf("%05lld %d died\n", get_timestamp(philosophers[i].data->time_start), philosophers[i].id);
 				pthread_mutex_lock(&philosophers[0].data->stop_mutex);
 				philosophers[0].data->stop = 1;
 				pthread_mutex_unlock(&philosophers[0].data->stop_mutex);
+				printf("%05lld %d died\n", get_timestamp(philosophers[i].data->time_start), philosophers[i].id);
 				pthread_mutex_unlock(&philosophers[i].last_meal_mutex);
 				return NULL;
 			}
@@ -125,9 +125,11 @@ void *monitor(void *void_data)
 			while(i < philosophers[0].data->number_of_philosophers)
 			{
 				pthread_mutex_lock(&philosophers[i].eat_count_mutex);
-				printf("philo %d eat_count: %d\n", i, philosophers[i].eat_count);
 				if(philosophers[i].eat_count < philosophers[0].data->number_of_times_each_philosopher_must_eat)
+				{
+					pthread_mutex_unlock(&philosophers[i].eat_count_mutex);
 					break;
+				}
 				pthread_mutex_unlock(&philosophers[i].eat_count_mutex);
 				i++;
 			}
@@ -153,6 +155,8 @@ int main(int argc, char **argv)
 
 	//setup
 	t_data data = init_data(argc, argv);
+	if(!data.number_of_philosophers || !data.time_to_die || !data.time_to_eat || !data.time_to_sleep || (argc == 6 && !data.number_of_times_each_philosopher_must_eat))
+		return (1);
 	pthread_mutex_t *forks = init_forks(data.number_of_philosophers);
 	if(!forks)
 		return (1);
@@ -169,7 +173,7 @@ int main(int argc, char **argv)
 	int i = 0;
 	while(i < data.number_of_philosophers)
 	{
-		pthread_create(&philo_threads[i], NULL, philo_think, philosophers + i);
+		pthread_create(&philo_threads[i], NULL, philo_loop, philosophers + i);
 		i++;
 	}
 	pthread_create(&monitor_thread, NULL, monitor, philosophers);
