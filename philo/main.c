@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 13:58:06 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/26 18:16:19 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/26 20:05:20 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,35 @@ void	print_usage(char *program)
 	printf("[number_of_times_each_philosopher_must_eat]\n");
 }
 
-void cleanup(t_data *data, t_philo *philosophers, pthread_mutex_t *forks, pthread_t *philo_threads)
+void	create_threads(pthread_t *philo_threads, t_philo *philos, pthread_t *monitor_thread)
 {
-	int i;
+	int	i;
+
+	i = 0;
+	while (i < philos[0].data->nb_philo)
+	{
+		pthread_create(&philo_threads[i], NULL, philo_loop, &philos[i]);
+		i++;
+	}
+	pthread_create(monitor_thread, NULL, monitor, philos);
+}
+
+void	join_threads(pthread_t *philo_threads, int nb_philo, pthread_t monitor_thread)
+{
+	int	i;
+
+	i = 0;
+	while (i < nb_philo)
+	{
+		pthread_join(philo_threads[i], NULL);
+		i++;
+	}
+	pthread_join(monitor_thread, NULL);
+}
+
+void	cleanup(t_data *data, t_philo *philosophers, pthread_mutex_t *forks, pthread_t *philo_threads)
+{
+	int	i;
 
 	i = 0;
 	while (i < data->nb_philo)
@@ -39,19 +65,6 @@ void cleanup(t_data *data, t_philo *philosophers, pthread_mutex_t *forks, pthrea
 	free(forks);
 	free(philosophers);
 	free(philo_threads);
-}
-
-void join_threads(pthread_t *philo_threads, int nb_philo, pthread_t monitor_thread)
-{
-	int i;
-
-	i = 0;
-	while (i < nb_philo)
-	{
-		pthread_join(philo_threads[i], NULL);
-		i++;
-	}
-	pthread_join(monitor_thread, NULL);
 }
 
 int	main(int argc, char **argv)
@@ -90,13 +103,7 @@ int	main(int argc, char **argv)
 		free(philosophers);
 		return (1);
 	}
-	int i = 0;
-	while (i < data.nb_philo)
-	{
-		pthread_create(&philo_threads[i], NULL, philo_loop, philosophers + i);
-		i++;
-	}
-	pthread_create(&monitor_thread, NULL, monitor, philosophers);
+	create_threads(philo_threads, philosophers, &monitor_thread);
 	join_threads(philo_threads, data.nb_philo, monitor_thread);
 	cleanup(&data, philosophers, forks, philo_threads);
 	return (0);

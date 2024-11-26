@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/26 13:02:49 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/26 17:56:55 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/26 19:44:28 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,8 +92,8 @@ t_philo	*init_philosophers(t_data *data, pthread_mutex_t *forks)
 			philosophers[i].right_fork = NULL;
 		philosophers[i].data = data;
 		philosophers[i].last_meal = data->time_start;
-		pthread_mutex_init(&philosophers[i].last_meal_mutex, NULL);
 		philosophers[i].eat_count = 0;
+		pthread_mutex_init(&philosophers[i].last_meal_mutex, NULL);
 		pthread_mutex_init(&philosophers[i].eat_count_mutex, NULL);
 		i++;
 	}
