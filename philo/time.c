@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 17:43:22 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/26 15:27:55 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/26 16:53:20 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,8 @@ long long	get_time(void)
 {
 	struct timeval	tv;
 
-	if(gettimeofday(&tv, NULL) == -1)
-		write(2, "Error: gettimeofday\n", 20);
+	if (gettimeofday(&tv, NULL) == -1)
+		return (write(2, "Error: gettimeofday\n", 20), -1);
 	return (tv.tv_sec * 1000 + tv.tv_usec / 1000);
 }
 

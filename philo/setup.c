@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/26 13:02:49 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/26 15:10:37 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/26 17:56:55 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,18 +35,18 @@ static int	ft_atoi(const char *nptr)
 	return (num * mult);
 }
 
-t_data	init_data(int argc, char **argv)
+t_data	parse_and_init_data(int argc, char **argv)
 {
 	t_data	data;
 
-	data.number_of_philosophers = ft_atoi(argv[1]);
+	data.nb_philo = ft_atoi(argv[1]);
 	data.time_to_die = ft_atoi(argv[2]);
 	data.time_to_eat = ft_atoi(argv[3]);
 	data.time_to_sleep = ft_atoi(argv[4]);
 	if (argc == 6)
-		data.number_of_times_each_philosopher_must_eat = ft_atoi(argv[5]);
+		data.nb_philo_eat = ft_atoi(argv[5]);
 	else
-		data.number_of_times_each_philosopher_must_eat = -1;
+		data.nb_philo_eat = -1;
 	data.time_start = get_time();
 	data.stop = 0;
 	pthread_mutex_init(&data.stop_mutex, NULL);
@@ -76,17 +76,17 @@ t_philo	*init_philosophers(t_data *data, pthread_mutex_t *forks)
 	int		i;
 	t_philo	*philosophers;
 
-	philosophers = malloc(sizeof(t_philo) * data->number_of_philosophers);
+	philosophers = malloc(sizeof(t_philo) * data->nb_philo);
 	if (!philosophers)
 		return (NULL);
 	i = 0;
-	while (i < data->number_of_philosophers)
+	while (i < data->nb_philo)
 	{
 		philosophers[i].id = i + 1;
 		philosophers[i].left_fork = &forks[i];
-		if (i == data->number_of_philosophers - 1 && data->number_of_philosophers > 1)
+		if (i == data->nb_philo - 1 && data->nb_philo > 1)
 			philosophers[i].right_fork = &forks[0];
-		else if (i < data->number_of_philosophers - 1)
+		else if (i < data->nb_philo - 1)
 			philosophers[i].right_fork = &forks[i + 1];
 		else
 			philosophers[i].right_fork = NULL;

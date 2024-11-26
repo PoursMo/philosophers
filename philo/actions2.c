@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/26 15:17:13 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/26 15:35:24 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/26 16:52:23 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,13 +22,13 @@ int	is_stop(t_data *data)
 	return (stop);
 }
 
-void print_action(t_philo *philo, char *action)
+void	print_action(t_philo *philo, char *action)
 {
-	long long timestamp;
+	long long	timestamp;
 
 	pthread_mutex_lock(&philo->data->print_mutex);
 	timestamp = get_timestamp(philo->data->time_start);
-	if(!is_stop(philo->data))
+	if (!is_stop(philo->data))
 		printf("%05lld %d %s\n", timestamp, philo->id, action);
 	pthread_mutex_unlock(&philo->data->print_mutex);
 }
