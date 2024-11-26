@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 13:58:19 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/24 15:38:44 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/26 15:35:21 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,9 @@ typedef struct s_data
 	int			time_to_sleep;
 	int			number_of_times_each_philosopher_must_eat;
 	long long	time_start;
-	char		stop;
+	int		stop;
 	pthread_mutex_t stop_mutex;
+	pthread_mutex_t print_mutex;
 } t_data;
 
 typedef struct s_philo
@@ -45,15 +46,20 @@ typedef struct s_philo
 } t_philo;
 
 //actions1.c
-void	*philo_take_left_fork(void *void_data);
-void	*philo_take_right_fork(void *void_data);
-void	*philo_eat(void *void_data);
-void	*philo_think(void *void_data);
-void	*philo_sleep(void *void_data);
 void	*philo_loop(void *void_data);
+
+//actions2.c
+int	is_stop(t_data *data);
+void print_action(t_philo *philo, char *action);
 
 //time.c
 long long	get_time();
 long long	get_timestamp(long long time_start);
+int	ft_usleep(size_t milliseconds);
+
+//setup.c
+t_data	init_data(int argc, char **argv);
+pthread_mutex_t	*init_forks(int number_of_forks);
+t_philo	*init_philosophers(t_data *data, pthread_mutex_t *forks);
 
 #endif
