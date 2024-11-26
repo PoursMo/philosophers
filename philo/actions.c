@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 17:42:28 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/26 21:57:09 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/26 22:43:14 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ static void	philo_think(t_philo *philo)
 static void	philo_sleep(t_philo *philo)
 {
 	print_action(philo, "is sleeping");
-	usleep(philo->data->time_to_sleep * 1000);
+	ft_usleep(philo->data->time_to_sleep);
 }
 
 static void	philo_eat(t_philo *philo)
@@ -29,7 +29,7 @@ static void	philo_eat(t_philo *philo)
 	print_action(philo, "has taken a fork");
 	if (philo->data->nb_philo == 1)
 	{
-		usleep(philo->data->time_to_die * 1000);
+		ft_usleep(philo->data->time_to_die);
 		pthread_mutex_unlock(philo->left_fork);
 		return ;
 	}

@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 13:58:19 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/26 22:43:28 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/26 22:07:12 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,6 @@ void			*monitor_philos(void *void_philosophers);
 //time.c
 long long		get_time(void);
 long long		get_timestamp(long long time_start);
-int				ft_usleep(size_t milliseconds);
 
 //setup.c
 t_data			parse_and_init_data(int argc, char **argv);
