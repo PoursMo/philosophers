@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 13:58:06 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/26 20:05:20 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/26 21:34:44 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,33 +22,33 @@ void	print_usage(char *program)
 	printf("[number_of_times_each_philosopher_must_eat]\n");
 }
 
-void	create_threads(pthread_t *philo_threads, t_philo *philos, pthread_t *monitor_thread)
+void	create_threads(pthread_t *threads, t_philo *philos, pthread_t *monitor)
 {
 	int	i;
 
 	i = 0;
 	while (i < philos[0].data->nb_philo)
 	{
-		pthread_create(&philo_threads[i], NULL, philo_loop, &philos[i]);
+		pthread_create(&threads[i], NULL, philo_loop, &philos[i]);
 		i++;
 	}
-	pthread_create(monitor_thread, NULL, monitor, philos);
+	pthread_create(monitor, NULL, monitor, philos);
 }
 
-void	join_threads(pthread_t *philo_threads, int nb_philo, pthread_t monitor_thread)
+void	join_threads(pthread_t *threads, int nb_philo, pthread_t monitor)
 {
 	int	i;
 
 	i = 0;
 	while (i < nb_philo)
 	{
-		pthread_join(philo_threads[i], NULL);
+		pthread_join(threads[i], NULL);
 		i++;
 	}
-	pthread_join(monitor_thread, NULL);
+	pthread_join(monitor, NULL);
 }
 
-void	cleanup(t_data *data, t_philo *philosophers, pthread_mutex_t *forks, pthread_t *philo_threads)
+void	cleanup(t_data *data, t_philo *philos, pthread_mutex_t *forks, pthread_t *threads)
 {
 	int	i;
 
@@ -56,15 +56,15 @@ void	cleanup(t_data *data, t_philo *philosophers, pthread_mutex_t *forks, pthrea
 	while (i < data->nb_philo)
 	{
 		pthread_mutex_destroy(&forks[i]);
-		pthread_mutex_destroy(&philosophers[i].last_meal_mutex);
-		pthread_mutex_destroy(&philosophers[i].eat_count_mutex);
+		pthread_mutex_destroy(&philos[i].last_meal_mutex);
+		pthread_mutex_destroy(&philos[i].eat_count_mutex);
 		i++;
 	}
 	pthread_mutex_destroy(&data->stop_mutex);
 	pthread_mutex_destroy(&data->print_mutex);
 	free(forks);
-	free(philosophers);
-	free(philo_threads);
+	free(philos);
+	free(threads);
 }
 
 int	main(int argc, char **argv)
