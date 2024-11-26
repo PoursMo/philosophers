@@ -6,20 +6,31 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 13:58:06 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/26 21:34:44 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/26 21:53:54 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	print_usage(char *program)
+int	allocations(t_data *dt, t_philo **ps, pthread_mutex_t **fs, pthread_t **ts)
 {
-	printf("Usage: %s ", program);
-	printf("number_of_philosopher ");
-	printf("time_to_die ");
-	printf("time_to_eat ");
-	printf("time_to_sleep ");
-	printf("[number_of_times_each_philosopher_must_eat]\n");
+	*fs = init_forks(dt->nb_philo);
+	if (!*fs)
+		return (0);
+	*ps = init_philosophers(dt, *fs);
+	if (!*ps)
+	{
+		free(*fs);
+		return (0);
+	}
+	*ts = malloc(sizeof(pthread_t) * dt->nb_philo);
+	if (!*ts)
+	{
+		free(*fs);
+		free(*ps);
+		return (0);
+	}
+	return (1);
 }
 
 void	create_threads(pthread_t *threads, t_philo *philos, pthread_t *monitor)
@@ -32,7 +43,7 @@ void	create_threads(pthread_t *threads, t_philo *philos, pthread_t *monitor)
 		pthread_create(&threads[i], NULL, philo_loop, &philos[i]);
 		i++;
 	}
-	pthread_create(monitor, NULL, monitor, philos);
+	pthread_create(monitor, NULL, monitor_philos, philos);
 }
 
 void	join_threads(pthread_t *threads, int nb_philo, pthread_t monitor)
@@ -48,23 +59,23 @@ void	join_threads(pthread_t *threads, int nb_philo, pthread_t monitor)
 	pthread_join(monitor, NULL);
 }
 
-void	cleanup(t_data *data, t_philo *philos, pthread_mutex_t *forks, pthread_t *threads)
+void	cleanup(t_data *data, t_philo *ps, pthread_mutex_t *fs, pthread_t *ts)
 {
 	int	i;
 
 	i = 0;
 	while (i < data->nb_philo)
 	{
-		pthread_mutex_destroy(&forks[i]);
-		pthread_mutex_destroy(&philos[i].last_meal_mutex);
-		pthread_mutex_destroy(&philos[i].eat_count_mutex);
+		pthread_mutex_destroy(&fs[i]);
+		pthread_mutex_destroy(&ps[i].last_meal_mutex);
+		pthread_mutex_destroy(&ps[i].eat_count_mutex);
 		i++;
 	}
 	pthread_mutex_destroy(&data->stop_mutex);
 	pthread_mutex_destroy(&data->print_mutex);
-	free(forks);
-	free(philos);
-	free(threads);
+	free(fs);
+	free(ps);
+	free(ts);
 }
 
 int	main(int argc, char **argv)
@@ -87,22 +98,8 @@ int	main(int argc, char **argv)
 		print_usage(argv[0]);
 		return (1);
 	}
-	forks = init_forks(data.nb_philo);
-	if (!forks)
+	if (!allocations(&data, &philosophers, &forks, &philo_threads))
 		return (1);
-	philosophers = init_philosophers(&data, forks);
-	if (!philosophers)
-	{
-		free(forks);
-		return (1);
-	}
-	philo_threads = malloc(sizeof(pthread_t) * data.nb_philo);
-	if (!philo_threads)
-	{
-		free(forks);
-		free(philosophers);
-		return (1);
-	}
 	create_threads(philo_threads, philosophers, &monitor_thread);
 	join_threads(philo_threads, data.nb_philo, monitor_thread);
 	cleanup(&data, philosophers, forks, philo_threads);
