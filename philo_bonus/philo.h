@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 13:58:19 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/27 13:47:50 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/27 15:47:45 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 # include <sys/wait.h>
 # include <semaphore.h>
 # include <fcntl.h>
-# include <limits.h>
+# include <stdint.h>
 
 
 typedef struct s_data
@@ -75,6 +75,7 @@ char	*ft_strjoin(const char *str1, const char *str2);
 //time.c
 long long		get_time(void);
 long long		get_timestamp(long long time_start);
+int				ft_usleep(size_t milliseconds);
 
 //setup.c
 t_data	parse_and_init_data(int argc, char **argv);

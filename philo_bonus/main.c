@@ -6,13 +6,13 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 13:58:06 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/27 14:08:45 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/27 15:45:31 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int	allocations(t_data *dt, t_philo **ps, pthread_mutex_t **fs, pthread_t **ts)
+int	allocations(t_data *dt, t_philo **ps, sem_t ***fs, pid_t **ts)
 {
 	*fs = init_forks(dt->nb_philo);
 	if (!*fs)
@@ -23,7 +23,7 @@ int	allocations(t_data *dt, t_philo **ps, pthread_mutex_t **fs, pthread_t **ts)
 		free(*fs);
 		return (0);
 	}
-	*ts = malloc(sizeof(pthread_t) * dt->nb_philo);
+	*ts = malloc(sizeof(pid_t) * dt->nb_philo);
 	if (!*ts)
 	{
 		free(*fs);
@@ -33,33 +33,38 @@ int	allocations(t_data *dt, t_philo **ps, pthread_mutex_t **fs, pthread_t **ts)
 	return (1);
 }
 
-void	create_threads(pthread_t *threads, t_philo *philos, pthread_t *monitor)
+void	create_processes(pid_t *processes, t_philo *philos, pthread_t *monitor)
 {
 	int	i;
 
 	i = 0;
 	while (i < philos[0].data->nb_philo)
 	{
-		pthread_create(&threads[i], NULL, philo_loop, &philos[i]);
+		processes[i] = fork();
+		if(processes[i])
+		{
+			philo_loop(&philos[i]);
+			exit(0);
+		}
 		i++;
 	}
 	pthread_create(monitor, NULL, monitor_philos, philos);
 }
 
-void	join_threads(pthread_t *threads, int nb_philo, pthread_t monitor)
+void	join_threads(pid_t *processes, int nb_philo, pthread_t monitor)
 {
 	int	i;
 
 	i = 0;
 	while (i < nb_philo)
 	{
-		pthread_join(threads[i], NULL);
+		waitpid(processes[i], NULL, 0);
 		i++;
 	}
 	pthread_join(monitor, NULL);
 }
 
-void	cleanup(t_data *data, t_philo *ps, sem_t **fs, pthread_t *ts)
+void	cleanup(t_data *data, t_philo *ps, sem_t **fs, pid_t *ts)
 {
 	int	i;
 	char *itoa;
@@ -87,6 +92,7 @@ void	cleanup(t_data *data, t_philo *ps, sem_t **fs, pthread_t *ts)
 	sem_close(data->stop_sem);
 	sem_unlink("stop_sem");
 	sem_close(data->print_sem);
+	sem_unlink("stop_sem");
 	free(fs);
 	free(ps);
 	free(ts);
@@ -97,7 +103,7 @@ int	main(int argc, char **argv)
 	t_data			data;
 	t_philo			*philosophers;
 	sem_t	**forks;
-	pthread_t		*philo_threads;
+	pid_t		*philo_pids;
 	pthread_t		monitor_thread;
 
 	if (argc < 5 || argc > 6)
@@ -112,10 +118,10 @@ int	main(int argc, char **argv)
 		print_usage(argv[0]);
 		return (1);
 	}
-	if (!allocations(&data, &philosophers, &forks, &philo_threads))
+	if (!allocations(&data, &philosophers, &forks, &philo_pids))
 		return (1);
-	create_threads(philo_threads, philosophers, &monitor_thread);
-	join_threads(philo_threads, data.nb_philo, monitor_thread);
-	cleanup(&data, philosophers, forks, philo_threads);
+	create_processes(philo_pids, philosophers, &monitor_thread);
+	join_threads(philo_pids, data.nb_philo, monitor_thread);
+	cleanup(&data, philosophers, forks, philo_pids);
 	return (0);
 }
