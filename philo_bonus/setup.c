@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/26 13:02:49 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/29 13:21:21 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/29 14:54:17 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,12 +48,12 @@ t_data	parse_and_init_data(int argc, char **argv)
 	else
 		data.nb_philo_eat = -1;
 	data.time_start = get_time();
-	sem_unlink("/stop_sem");
-	data.stop_sem = sem_open("/stop", O_CREAT, 0);
-	sem_unlink("/print_sem");
-	data.print_sem = sem_open("/print", O_CREAT, 1);
+	sem_unlink("/stop");
+	data.stop_sem = sem_open("/stop", O_CREAT, 0644, 0);
+	sem_unlink("/print");
+	data.print_sem = sem_open("/print", O_CREAT, 0644, 1);
 	sem_unlink("/philo_forks");
-	data.forks_sem = sem_open("/philo_forks", O_CREAT, data.nb_philo);
+	data.forks_sem = sem_open("/philo_forks", O_CREAT, 0644, data.nb_philo);
 	return (data);
 }
 
@@ -78,11 +78,11 @@ t_philo	*init_philosophers(t_data *data)
 		ft_strlcpy(sem_name, "/last_meal_", NAME_MAX - 4);
 		ft_strlcat(sem_name, itoa, NAME_MAX - 4);
 		sem_unlink(sem_name);
-		philosophers[i].last_meal_sem = sem_open(sem_name, O_CREAT, 1);
+		philosophers[i].last_meal_sem = sem_open(sem_name, O_CREAT, 0644, 1);
 		ft_strlcpy(sem_name, "/eat_count_", NAME_MAX - 4);
 		ft_strlcat(sem_name, itoa, NAME_MAX - 4);
 		sem_unlink(sem_name);
-		philosophers[i].eat_count_sem = sem_open(sem_name, O_CREAT, 1);
+		philosophers[i].eat_count_sem = sem_open(sem_name, O_CREAT, 0644, 1);
 		free(itoa);
 		i++;
 	}

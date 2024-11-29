@@ -1,7 +1,7 @@
 CC = gcc
 CFLAG = -Wall -Wextra -Werror -pthread
 NAME = philo
-SRCS = main.c time.c actions.c utils.c setup.c monitor.c itoa.c minilibft.c
+SRCS = main.c time.c actions.c utils.c setup.c ft_strings.c ft_itoa.c
 OBJS = $(SRCS:.c=.o)
 
 all: $(NAME)

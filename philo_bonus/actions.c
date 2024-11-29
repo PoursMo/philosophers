@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 17:42:28 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/29 13:21:13 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/29 14:44:07 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ void	philo_loop(t_philo *philo)
 {
 	if (philo->id % 2 == 0)
 		ft_usleep(1);
-	while (!is_stop(philo->data))
+	while (1)
 	{
 		philo_think(philo);
 		philo_eat(philo);
