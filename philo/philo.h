@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 13:58:19 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/26 22:43:28 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/27 11:33:33 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ typedef struct s_philo
 	pthread_mutex_t	eat_count_mutex;
 }	t_philo;
 
-//actions1.c
+//actions.c
 void			*philo_loop(void *void_data);
 
 //utils.c
