@@ -6,63 +6,56 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 13:58:19 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/26 22:07:12 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/29 13:02:35 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PHILO_H
 # define PHILO_H
 
-# include <pthread.h>
+# include <string.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
-# include <string.h>
+# include <sys/types.h>
+# include <sys/wait.h>
+# include <pthread.h>
+# include <semaphore.h>
 # include <sys/time.h>
+# include <limits.h>
+# include <stdint.h>
+# include <fcntl.h>
 
 typedef struct s_data
 {
-	int				nb_philo;
-	int				time_to_die;
-	int				time_to_eat;
-	int				time_to_sleep;
-	int				nb_philo_eat;
-	long long		time_start;
-	int				stop;
-	pthread_mutex_t	stop_mutex;
-	pthread_mutex_t	print_mutex;
+	int			nb_philo;
+	int			time_to_die;
+	int			time_to_eat;
+	int			time_to_sleep;
+	int			nb_philo_eat;
+	long long	time_start;
+	sem_t		*stop_sem;
+	sem_t		*print_sem;
+	sem_t		*forks_sem;
 }	t_data;
 
 typedef struct s_philo
 {
-	int				id;
-	pthread_mutex_t	*right_fork;
-	pthread_mutex_t	*left_fork;
-	t_data			*data;
-	long long		last_meal;
-	int				eat_count;
-	pthread_mutex_t	last_meal_mutex;
-	pthread_mutex_t	eat_count_mutex;
+	int			id;
+	t_data		*data;
+	long long	last_meal;
+	int			eat_count;
+	sem_t		*last_meal_sem;
+	sem_t		*eat_count_sem;
 }	t_philo;
 
-//actions1.c
-void			*philo_loop(void *void_data);
+// ft_strings.c
+size_t	ft_strlen(const char *s);
+size_t	ft_strlcat(char *dst, const char *src, size_t size);
+size_t	ft_strlcpy(char *dst, const char *src, size_t size);
 
-//utils.c
-int				is_stop(t_data *data);
-void			print_action(t_philo *philo, char *action);
-void			print_usage(char *program);
 
-//monitor.c
-void			*monitor_philos(void *void_philosophers);
-
-//time.c
-long long		get_time(void);
-long long		get_timestamp(long long time_start);
-
-//setup.c
-t_data			parse_and_init_data(int argc, char **argv);
-pthread_mutex_t	*init_forks(int number_of_forks);
-t_philo			*init_philosophers(t_data *data, pthread_mutex_t *forks);
+// ft_itoa.c
+char	*ft_itoa(int num);
 
 #endif
