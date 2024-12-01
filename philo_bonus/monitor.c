@@ -6,70 +6,86 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/26 16:57:15 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/27 13:46:57 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/12/01 20:50:25 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-static int	check_death(t_philo *philos)
+static void	check_death(t_philo philo)
 {
-	int	i;
-
-	i = 0;
-	while (i < philos[0].data->nb_philo)
+	sem_wait(philo.last_meal_sem);
+	if (get_time() - philo.last_meal >= philo.data->time_to_die)
 	{
-		sem_wait(philos[i].last_meal_sem);
-		if (get_time() - philos[i].last_meal >= philos[i].data->time_to_die)
-		{
-			sem_post(philos[i].last_meal_sem);
-			print_action(philos + i, "died");
-			sem_wait(philos[0].data->stop_sem);
-			philos[0].data->stop = 1;
-			sem_post(philos[0].data->stop_sem);
-			return (1);
-		}
-		sem_post(philos[i].last_meal_sem);
-		i++;
+		sem_post(philo.last_meal_sem);
+		sem_wait(philo.data->print_sem);
+		printf("%05lld %d died\n", get_timestamp(philo.data->time_start), philo.id);
+		sem_post(philo.data->stop_sem);
 	}
-	return (0);
+	sem_post(philo.last_meal_sem);
 }
 
-static int	check_eats(t_philo *philos)
+static void	check_fullness(t_philo philo)
 {
-	int	i;
+	static int is_full;
 
-	i = 0;
-	while (i < philos[0].data->nb_philo)
+	if(!is_full)
 	{
-		sem_wait(philos[i].eat_count_sem);
-		if (philos[i].eat_count < philos[0].data->nb_philo_eat)
+		sem_wait(philo.eat_count_sem);
+		if (philo.eat_count >= philo.data->nb_philo_eat)
 		{
-			sem_post(philos[i].eat_count_sem);
-			break ;
+			is_full = 1;
+			// post full philos
+			sem_post(philo.eat_count_sem);
 		}
-		sem_post(philos[i].eat_count_sem);
-		i++;
+		sem_post(philo.eat_count_sem);
 	}
-	if (i == philos[0].data->nb_philo)
-	{
-		sem_wait(philos[0].data->stop_sem);
-		philos[0].data->stop = 1;
-		sem_post(philos[0].data->stop_sem);
-		return (1);
-	}
-	return (0);
 }
 
-void	*monitor_philos(void *void_data)
+void	*monitor_philo(void *void_philo)
 {
-	t_philo	*philos;
+	t_philo	*philo;
 
-	philos = (t_philo *)void_data;
+	philo = (t_philo *)void_philo;
 	while (1)
 	{
-		if (check_death(philos)
-			|| (philos[0].data->nb_philo_eat != -1 && check_eats(philos)))
+		check_death(*philo);
+		check_fullness(*philo);
+	}
+	return (NULL);
+}
+
+void *monitor_stop(void *void_data)
+{
+	t_data *data;
+	int i;
+
+	data = (t_data *)void_data;
+	sem_wait(data->stop_sem);
+	i = 0;
+	while(i < data->nb_philo)
+	{
+		kill(data->philo_processes[i], SIGTERM);
+		i++;
+	}
+	return (NULL);
+}
+
+void *monitor_fulls(void *void_data)
+{
+	int count;
+	t_data data;
+
+	count = 0;
+	data = *(t_data *)void_data;
+	while(1)
+	{
+		sem_wait(data.full_philos_sem);
+		count++;
+		if(count >= data.nb_philo_eat)
+		{
+			sem_post(data.stop_sem);
 			return (NULL);
+		}
 	}
 }

@@ -6,19 +6,19 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 13:58:06 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/29 14:58:00 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/12/01 20:50:40 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int	allocations(t_data *data, t_philo **philos, pid_t **processes)
+int	allocations(t_data *data, t_philo **philos)
 {
 	*philos = init_philosophers(data);
 	if (!*philos)
 		return (0);
-	*processes = malloc(sizeof(pid_t) * data->nb_philo);
-	if (!*processes)
+	data->philo_processes = malloc(sizeof(pid_t) * data->nb_philo);
+	if (!data->philo_processes)
 	{
 		free(*philos);
 		return (0);
@@ -26,28 +26,18 @@ int	allocations(t_data *data, t_philo **philos, pid_t **processes)
 	return (1);
 }
 
-void	launch_processes(pid_t *processes, t_philo *philos)
+void	launch_processes(t_philo *philos)
 {
 	int	i;
 
 	i = 0;
 	while (i < philos[0].data->nb_philo)
 	{
-		processes[i] = fork();
-		if(processes[i] != 0)
+		philos[0].data->philo_processes[i] = fork();
+		if(philos[0].data->philo_processes[i] == 0)
 		{
-			if(processes[i] % 2 == 0)
-			{
-				ft_usleep(2000);
-				printf("philo %d dead\n", philos[i].id);
-				sem_post(philos[0].data->stop_sem);
-			}
-			else
-			{
-				while(1)
-					printf("oui\n");
-			}
-			exit(0);
+			pthread_create(&philos[i].philo_monitor, NULL, monitor_philo, (void *)(philos + i));
+			philo_loop(philos + i);
 		}
 		i++;
 	}
@@ -88,8 +78,8 @@ int	main(int argc, char **argv)
 {
 	t_data			data;
 	t_philo			*philosophers;
-	pid_t			*philo_processes;
-	// pthread_t		monitor_thread;
+	pthread_t		stop_thread;
+	pthread_t		fullness_thread;
 
 	if (argc < 5 || argc > 6)
 	{
@@ -103,14 +93,13 @@ int	main(int argc, char **argv)
 		print_usage(argv[0]);
 		return (1);
 	}
-	printf("data.stop_sem: %p\n", (void *)data.stop_sem);
-	printf("data.print_sem: %p\n", (void *)data.print_sem);
-	if (!allocations(&data, &philosophers, &philo_processes))
+	if (!allocations(&data, &philosophers))
 		return (1);
-	launch_processes(philo_processes, philosophers);
-	sem_wait(data.stop_sem);
-	kill(0, 1);
-	wait_processes(philo_processes, data.nb_philo);
+	pthread_create(&stop_thread, NULL, monitor_stop, &data);
+	if (data.nb_philo_eat != -1)
+		pthread_create(&fullness_thread, NULL, monitor_fulls, (void *)&data);
+	launch_processes(philosophers);
+	wait_processes(data.philo_processes, data.nb_philo);
 	// cleanup(&data, philosophers, forks, philo_threads);
 	return (0);
 }

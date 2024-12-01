@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 13:58:19 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/29 14:40:19 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/12/01 20:31:31 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,8 @@ typedef struct s_data
 	sem_t		*stop_sem;
 	sem_t		*print_sem;
 	sem_t		*forks_sem;
+	sem_t		*full_philos_sem;
+	pid_t			*philo_processes;
 }	t_data;
 
 typedef struct s_philo
@@ -47,6 +49,7 @@ typedef struct s_philo
 	int			eat_count;
 	sem_t		*last_meal_sem;
 	sem_t		*eat_count_sem;
+	pthread_t	philo_monitor;
 }	t_philo;
 
 // ft_strings.c
@@ -69,5 +72,13 @@ void			print_usage(char *program);
 //setup.c
 t_data			parse_and_init_data(int argc, char **argv);
 t_philo	*init_philosophers(t_data *data);
+
+//monitor.c
+void	*monitor_philo(void *void_philo);
+void *monitor_stop(void *void_data);
+void *monitor_fulls(void *void_data);
+
+//actions.c
+void	philo_loop(t_philo *philo);
 
 #endif
