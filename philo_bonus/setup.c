@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/26 13:02:49 by aloubry           #+#    #+#             */
-/*   Updated: 2024/12/01 20:19:56 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/12/01 21:42:17 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,8 @@ t_data	parse_and_init_data(int argc, char **argv)
 	data.print_sem = sem_open("/print", O_CREAT, 0644, 1);
 	sem_unlink("/philo_forks");
 	data.forks_sem = sem_open("/philo_forks", O_CREAT, 0644, data.nb_philo);
+	sem_unlink("/philo_full");
+	data.full_philos_sem = sem_open("/philo_full", O_CREAT, 0644, 0);
 	return (data);
 }
 

@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/26 16:57:15 by aloubry           #+#    #+#             */
-/*   Updated: 2024/12/01 20:50:25 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/12/01 21:48:50 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@ static void	check_death(t_philo philo)
 	sem_wait(philo.last_meal_sem);
 	if (get_time() - philo.last_meal >= philo.data->time_to_die)
 	{
-		sem_post(philo.last_meal_sem);
 		sem_wait(philo.data->print_sem);
 		printf("%05lld %d died\n", get_timestamp(philo.data->time_start), philo.id);
 		sem_post(philo.data->stop_sem);
@@ -35,8 +34,7 @@ static void	check_fullness(t_philo philo)
 		if (philo.eat_count >= philo.data->nb_philo_eat)
 		{
 			is_full = 1;
-			// post full philos
-			sem_post(philo.eat_count_sem);
+			sem_post(philo.data->full_philos_sem);
 		}
 		sem_post(philo.eat_count_sem);
 	}
@@ -82,7 +80,7 @@ void *monitor_fulls(void *void_data)
 	{
 		sem_wait(data.full_philos_sem);
 		count++;
-		if(count >= data.nb_philo_eat)
+		if(count >= data.nb_philo)
 		{
 			sem_post(data.stop_sem);
 			return (NULL);
