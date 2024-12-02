@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 17:43:22 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/26 22:43:17 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/12/02 14:41:10 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ int	ft_usleep(size_t milliseconds)
 	size_t	start;
 
 	start = get_time();
+	usleep(milliseconds * 0.75f * 1000);
 	while ((get_time() - start) < milliseconds)
 		usleep(500);
 	return (0);

@@ -1,6 +1,6 @@
 CC = gcc
 CFLAG = -Wall -Wextra -Werror -pthread
-NAME = philo
+NAME = philo_bonus
 SRCS = main.c time.c actions.c utils.c setup.c ft_strings.c ft_itoa.c monitor.c
 OBJS = $(SRCS:.c=.o)
 

@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/26 15:17:13 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/29 14:46:02 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/12/02 11:58:11 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,7 @@ void	print_action(t_philo *philo, char *action)
 
 	sem_wait(philo->data->print_sem);
 	timestamp = get_timestamp(philo->data->time_start);
-	if (1) //what
-		printf("%05lld %d %s\n", timestamp, philo->id, action);
+	printf("%05lld %d %s\n", timestamp, philo->id, action);
 	sem_post(philo->data->print_sem);
 }
 

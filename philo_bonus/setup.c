@@ -6,34 +6,11 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/26 13:02:49 by aloubry           #+#    #+#             */
-/*   Updated: 2024/12/01 21:42:17 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/12/02 14:16:03 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-
-static int	ft_atoi(const char *nptr)
-{
-	int	mult;
-	int	num;
-
-	mult = 1;
-	while (*nptr && ((*nptr >= '\t' && *nptr <= '\r') || *nptr == ' '))
-		nptr++;
-	if (*nptr == '+' || *nptr == '-')
-	{
-		if (*nptr == '-')
-			mult = -1;
-		nptr++;
-	}
-	num = 0;
-	while (*nptr && (*nptr >= '0' && *nptr <= '9'))
-	{
-		num = num * 10 + (*nptr - 48);
-		nptr++;
-	}
-	return (num * mult);
-}
 
 t_data	parse_and_init_data(int argc, char **argv)
 {
@@ -47,7 +24,6 @@ t_data	parse_and_init_data(int argc, char **argv)
 		data.nb_philo_eat = ft_atoi(argv[5]);
 	else
 		data.nb_philo_eat = -1;
-	data.time_start = get_time();
 	sem_unlink("/stop");
 	data.stop_sem = sem_open("/stop", O_CREAT, 0644, 0);
 	sem_unlink("/print");

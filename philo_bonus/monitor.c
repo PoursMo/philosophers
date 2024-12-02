@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/26 16:57:15 by aloubry           #+#    #+#             */
-/*   Updated: 2024/12/01 21:48:50 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/12/02 17:29:43 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,18 +72,19 @@ void *monitor_stop(void *void_data)
 void *monitor_fulls(void *void_data)
 {
 	int count;
-	t_data data;
+	t_data *data;
 
 	count = 0;
-	data = *(t_data *)void_data;
-	while(1)
+	data = (t_data *)void_data;
+	while(data->nb_philo_eat != -1)
 	{
-		sem_wait(data.full_philos_sem);
+		sem_wait(data->full_philos_sem);
 		count++;
-		if(count >= data.nb_philo)
+		if(count >= data->nb_philo)
 		{
-			sem_post(data.stop_sem);
+			sem_post(data->stop_sem);
 			return (NULL);
 		}
 	}
+	return (NULL);
 }

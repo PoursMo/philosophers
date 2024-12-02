@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 12:38:01 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/29 12:38:45 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/12/02 13:44:30 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,4 +59,27 @@ size_t	ft_strlcpy(char *dst, const char *src, size_t size)
 		*dst++ = *src++;
 	*dst = '\0';
 	return (srclen);
+}
+
+int	ft_atoi(const char *nptr)
+{
+	int	mult;
+	int	num;
+
+	mult = 1;
+	while (*nptr && ((*nptr >= '\t' && *nptr <= '\r') || *nptr == ' '))
+		nptr++;
+	if (*nptr == '+' || *nptr == '-')
+	{
+		if (*nptr == '-')
+			mult = -1;
+		nptr++;
+	}
+	num = 0;
+	while (*nptr && (*nptr >= '0' && *nptr <= '9'))
+	{
+		num = num * 10 + (*nptr - 48);
+		nptr++;
+	}
+	return (num * mult);
 }
