@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 13:58:19 by aloubry           #+#    #+#             */
-/*   Updated: 2024/12/02 13:46:40 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/12/04 14:52:55 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ typedef struct s_data
 	sem_t		*print_sem;
 	sem_t		*forks_sem;
 	sem_t		*full_philos_sem;
-	pid_t			*philo_processes;
+	pid_t		*philo_processes;
 }	t_data;
 
 typedef struct s_philo
@@ -53,33 +53,35 @@ typedef struct s_philo
 }	t_philo;
 
 // ft_strings.c
-size_t	ft_strlen(const char *s);
-size_t	ft_strlcat(char *dst, const char *src, size_t size);
-size_t	ft_strlcpy(char *dst, const char *src, size_t size);
-int	ft_atoi(const char *nptr);
+size_t		ft_strlen(const char *s);
+size_t		ft_strlcat(char *dst, const char *src, size_t size);
+size_t		ft_strlcpy(char *dst, const char *src, size_t size);
+int			ft_atoi(const char *nptr);
 
 // ft_itoa.c
-char	*ft_itoa(int num);
+char		*ft_itoa(int num);
 
 //time.c
-long long		get_time(void);
-long long		get_timestamp(long long time_start);
-int				ft_usleep(size_t milliseconds);
+long long	get_time(void);
+long long	get_timestamp(long long time_start);
+int			ft_usleep(size_t milliseconds);
 
 //utils.c
-void			print_action(t_philo *philo, char *action);
-void			print_usage(char *program);
+void		print_action(t_philo *philo, char *action);
+void		print_usage(char *program);
+void		make_nb_sem_name(char *sem_name, const char *name, const char *nb);
+void		clear_sem(char *sem_name, sem_t *sem_ptr);
 
 //setup.c
-t_data			parse_and_init_data(int argc, char **argv);
-t_philo	*init_philosophers(t_data *data);
+t_data		parse_and_init_data(int argc, char **argv);
+t_philo		*init_philosophers(t_data *data);
 
 //monitor.c
-void	*monitor_philo(void *void_philo);
-void *monitor_stop(void *void_data);
-void *monitor_fulls(void *void_data);
+void		*monitor_philo(void *void_philo);
+void		*monitor_stop(void *void_data);
+void		*monitor_fulls(void *void_data);
 
 //actions.c
-void	philo_loop(t_philo *philo);
+void		philo_loop(t_philo *philo);
 
 #endif

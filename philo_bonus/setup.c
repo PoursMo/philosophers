@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/26 13:02:49 by aloubry           #+#    #+#             */
-/*   Updated: 2024/12/02 14:16:03 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/12/04 13:24:09 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,8 @@ t_philo	*init_philosophers(t_data *data)
 {
 	int		i;
 	t_philo	*philosophers;
-	char sem_name[NAME_MAX - 4];
-	char *itoa;
+	char	sem_name[NAME_MAX - 4];
+	char	*itoa;
 
 	philosophers = malloc(sizeof(t_philo) * data->nb_philo);
 	if (!philosophers)
@@ -50,15 +50,12 @@ t_philo	*init_philosophers(t_data *data)
 	{
 		philosophers[i].id = i + 1;
 		philosophers[i].data = data;
-		philosophers[i].last_meal = data->time_start;
 		philosophers[i].eat_count = 0;
 		itoa = ft_itoa(i);
-		ft_strlcpy(sem_name, "/last_meal_", NAME_MAX - 4);
-		ft_strlcat(sem_name, itoa, NAME_MAX - 4);
+		make_nb_sem_name(sem_name, "/last_meal_", itoa);
 		sem_unlink(sem_name);
 		philosophers[i].last_meal_sem = sem_open(sem_name, O_CREAT, 0644, 1);
-		ft_strlcpy(sem_name, "/eat_count_", NAME_MAX - 4);
-		ft_strlcat(sem_name, itoa, NAME_MAX - 4);
+		make_nb_sem_name(sem_name, "/eat_count_", itoa);
 		sem_unlink(sem_name);
 		philosophers[i].eat_count_sem = sem_open(sem_name, O_CREAT, 0644, 1);
 		free(itoa);

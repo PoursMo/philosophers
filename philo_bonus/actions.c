@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 17:42:28 by aloubry           #+#    #+#             */
-/*   Updated: 2024/12/02 14:51:46 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/12/04 13:24:43 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ static void	philo_eat(t_philo *philo)
 	ft_usleep(philo->data->time_to_eat);
 	sem_post(philo->data->forks_sem);
 	sem_post(philo->data->forks_sem);
-	sem_wait(philo->eat_count_sem);	
+	sem_wait(philo->eat_count_sem);
 	philo->eat_count++;
 	sem_post(philo->eat_count_sem);
 }

@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 13:58:06 by aloubry           #+#    #+#             */
-/*   Updated: 2024/12/02 17:31:39 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/12/04 14:58:55 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,58 +26,74 @@ int	allocations(t_data *data, t_philo **philos)
 	return (1);
 }
 
-void	launch_processes(t_philo *philos)
+void	launch_all(t_philo *philos, pthread_t *stop_thread,
+		pthread_t *fullness_thread)
 {
-	int	i;
+	int			i;
+	long long	start;
 
-	long long start = get_time() + 5;
+	pthread_create(stop_thread, NULL, monitor_stop, philos[0].data);
+	if (philos[0].data->nb_philo_eat != -1)
+		pthread_create(fullness_thread, NULL, monitor_fulls, philos[0].data);
+	start = get_time() + 5;
 	philos[0].data->time_start = start;
 	i = 0;
 	while (i < philos[0].data->nb_philo)
 	{
 		philos[i].last_meal = start;
 		philos[0].data->philo_processes[i] = fork();
-		if(philos[0].data->philo_processes[i] == 0)
+		if (philos[0].data->philo_processes[i] == 0)
 		{
-			while(get_time() < start)
+			while (get_time() < start)
 				;
-			pthread_create(&philos[i].philo_monitor, NULL, monitor_philo, (void *)(philos + i));
+			pthread_create(&philos[i].philo_monitor,
+				NULL, monitor_philo, (void *)(philos + i));
 			philo_loop(philos + i);
 		}
 		i++;
 	}
 }
 
-void	wait_all(pid_t *processes, int nb_philo, pthread_t stop_thread)
-{
-	int	i;
-
-	i = 0;
-	while (i < nb_philo)
-	{
-		printf("waiting for process %d\n", processes[i]);
-		waitpid(processes[i], NULL, 0);
-		i++;
-	}
-	printf("joining stop_thread\n");
-	pthread_join(stop_thread, NULL);
-}
-
-void	cleanup(t_data *data, t_philo *philos)
+void	wait_all(t_data *data, pthread_t stop_thread, pthread_t fullness_thread)
 {
 	int	i;
 
 	i = 0;
 	while (i < data->nb_philo)
 	{
-		sem_close(philos[i].eat_count_sem);
-		sem_close(philos[i].last_meal_sem);
+		waitpid(data->philo_processes[i], NULL, 0);
 		i++;
 	}
-	sem_close(data->stop_sem);
-	sem_close(data->forks_sem);
-	sem_close(data->print_sem);
-	sem_close(data->full_philos_sem);
+	pthread_join(stop_thread, NULL);
+	if (data->nb_philo_eat != -1)
+	{
+		data->nb_philo_eat = -1;
+		sem_post(data->full_philos_sem);
+		pthread_join(fullness_thread, NULL);
+	}
+}
+
+void	cleanup(t_data *data, t_philo *philos)
+{
+	int		i;
+	char	*itoa;
+	char	sem_name[NAME_MAX - 4];
+
+	i = 0;
+	while (i < data->nb_philo)
+	{
+		itoa = ft_itoa(i);
+		make_nb_sem_name(sem_name, "/last_meal_", itoa);
+		clear_sem(sem_name, philos[i].last_meal_sem);
+		make_nb_sem_name(sem_name, "/eat_count_", itoa);
+		clear_sem(sem_name, philos[i].eat_count_sem);
+		free(itoa);
+		i++;
+	}
+	clear_sem("/stop", data->stop_sem);
+	clear_sem("/philo_forks", data->forks_sem);
+	clear_sem("/print", data->print_sem);
+	clear_sem("/philo_full", data->full_philos_sem);
 	free(philos);
 	free(data->philo_processes);
 }
@@ -103,19 +119,8 @@ int	main(int argc, char **argv)
 	}
 	if (!allocations(&data, &philosophers))
 		return (1);
-	pthread_create(&stop_thread, NULL, monitor_stop, &data);
-	if (data.nb_philo_eat != -1)
-		pthread_create(&fullness_thread, NULL, monitor_fulls, (void *)&data);
-	launch_processes(philosophers);
-	wait_all(data.philo_processes, data.nb_philo, stop_thread);
-	if (data.nb_philo_eat != -1)
-	{
-		data.nb_philo_eat = -1;
-		sem_post(data.full_philos_sem);
-		printf("joining fullness_thread\n");
-		pthread_join(fullness_thread, NULL);
-	}
-	printf("cleaning\n");
+	launch_all(philosophers, &stop_thread, &fullness_thread);
+	wait_all(&data, stop_thread, fullness_thread);
 	cleanup(&data, philosophers);
 	return (0);
 }
