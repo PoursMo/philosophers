@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 13:58:06 by aloubry           #+#    #+#             */
-/*   Updated: 2024/12/04 14:58:55 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/12/05 14:21:25 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,8 +111,8 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 	data = parse_and_init_data(argc, argv);
-	if (!data.nb_philo || !data.time_to_die || !data.time_to_eat
-		|| !data.time_to_sleep || (argc == 6 && !data.nb_philo_eat))
+	if (data.nb_philo <= 0 || data.time_to_die <= 0 || data.time_to_eat <= 0
+		|| data.time_to_sleep <= 0 || (argc == 6 && data.nb_philo_eat <= 0))
 	{
 		print_usage(argv[0]);
 		return (1);
