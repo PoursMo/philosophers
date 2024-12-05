@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/26 13:02:49 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/26 19:44:28 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/12/05 16:38:33 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,8 @@ static int	ft_atoi(const char *nptr)
 		num = num * 10 + (*nptr - 48);
 		nptr++;
 	}
+	if (*nptr && !(*nptr >= '0' && *nptr <= '9'))
+		return (0);
 	return (num * mult);
 }
 
