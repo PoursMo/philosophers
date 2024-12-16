@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 13:58:06 by aloubry           #+#    #+#             */
-/*   Updated: 2024/12/05 14:19:38 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/12/16 17:20:12 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,12 +38,12 @@ void	create_threads(pthread_t *threads, t_philo *philos, pthread_t *monitor)
 	int	i;
 
 	i = 0;
+	pthread_create(monitor, NULL, monitor_philos, philos);
 	while (i < philos[0].data->nb_philo)
 	{
 		pthread_create(&threads[i], NULL, philo_loop, &philos[i]);
 		i++;
 	}
-	pthread_create(monitor, NULL, monitor_philos, philos);
 }
 
 void	join_threads(pthread_t *threads, int nb_philo, pthread_t monitor)
